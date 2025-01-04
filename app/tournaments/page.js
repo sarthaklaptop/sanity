@@ -12,15 +12,37 @@ import {
 } from "../../components/ui/dropdown-menu";
 
 const TournamentPage = () => {
+  const feesOptions = [
+    { value: "", label: "All" },
+    { value: "free", label: "Free" },
+    { value: "paid", label: "Paid" },
+  ];
+
+  const modeOptions = [
+    { value: "", label: "All" },
+    { value: "solo", label: "Solo" },
+    { value: "duo", label: "Duo" },
+    { value: "squad", label: "Squad" },
+  ];
+
+  const statusOptions = [
+    { value: "", label: "All" },
+    { value: "open", label: "Open" },
+    { value: "live", label: "Live" },
+    { value: "complete", label: "Complete" },
+  ];
+
   const [filters, setFilters] = useState({
     entryFee: "",
     mode: "",
     status: "",
   });
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+  const handleOptionClick = (key, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
 
   const clearFilters = () => {
@@ -48,51 +70,61 @@ const TournamentPage = () => {
                 </Button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="w-56 bg-primary">
-                <div className="mb-4 p-2">
-                  <label className="block text-sm font-medium mb-2">
+              <DropdownMenuContent className="w-56 bg-black rounded-lg">
+                {/* Entry Fee */}
+                <div className="relative mb-4 p-2">
+                  <label className="block text-sm font-semibold mb-2">
                     Entry Fee
                   </label>
-                  <select
-                    name="entryFee"
-                    value={filters.entryFee}
-                    onChange={handleFilterChange}
-                    className="w-full  px-2 py-1 bg-primary border"
-                  >
-                    <option value="">All</option>
-                    <option value="free">Free</option>
-                    <option value="paid">Paid</option>
-                  </select>
+                  {feesOptions.map((option) => (
+                    <div
+                      key={option.value}
+                      className={`px-2 py-1 text-white hover:bg-gray-800 cursor-pointer ${
+                        filters.entryFee === option.value ? "bg-gray-800" : ""
+                      }`}
+                      onClick={() =>
+                        handleOptionClick("entryFee", option.value)
+                      }
+                    >
+                      {option.label}
+                    </div>
+                  ))}
                 </div>
-                <div className="mb-4 p-2">
-                  <label className="block text-sm font-medium mb-2">Mode</label>
-                  <select
-                    name="mode"
-                    value={filters.mode}
-                    onChange={handleFilterChange}
-                    className="w-full  px-2 py-1 bg-primary border"
-                  >
-                    <option value="">All</option>
-                    <option value="solo">Solo</option>
-                    <option value="duo">Duo</option>
-                    <option value="squad">Squad</option>
-                  </select>
+
+                {/* Mode */}
+                <div className="relative mb-4 p-2">
+                  <label className="block text-sm font-semibold mb-2">
+                    Mode
+                  </label>
+                  {modeOptions.map((option) => (
+                    <div
+                      key={option.value}
+                      className={`px-2 py-1 text-white hover:bg-gray-800 cursor-pointer ${
+                        filters.mode === option.value ? "bg-gray-800" : ""
+                      }`}
+                      onClick={() => handleOptionClick("mode", option.value)}
+                    >
+                      {option.label}
+                    </div>
+                  ))}
                 </div>
-                <div className="mb-4 p-2">
-                  <label className="block text-sm font-medium mb-2">
+
+                {/* Status */}
+                <div className="relative mb-4 p-2">
+                  <label className="block text-sm font-semibold mb-2">
                     Status
                   </label>
-                  <select
-                    name="status"
-                    value={filters.status}
-                    onChange={handleFilterChange}
-                    className="w-full  px-2 py-1 bg-primary border"
-                  >
-                    <option value="">All</option>
-                    <option value="open">Open</option>
-                    <option value="live">Live</option>
-                    <option value="completed">Completed</option>
-                  </select>
+                  {statusOptions.map((option) => (
+                    <div
+                      key={option.value}
+                      className={`px-2 py-1 text-white hover:bg-gray-800 cursor-pointer ${
+                        filters.status === option.value ? "bg-gray-800" : ""
+                      }`}
+                      onClick={() => handleOptionClick("status", option.value)}
+                    >
+                      {option.label}
+                    </div>
+                  ))}
                 </div>
 
                 <DropdownMenuSeparator />
@@ -100,7 +132,7 @@ const TournamentPage = () => {
                 <Button
                   variant="ghost"
                   onClick={clearFilters}
-                  className="w-full  transition-colors"
+                  className="w-full transition-colors"
                 >
                   Clear Filters
                 </Button>
