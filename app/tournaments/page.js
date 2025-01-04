@@ -10,32 +10,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 const TournamentPage = () => {
-  const feesOptions = [
-    { value: "", label: "All" },
-    { value: "free", label: "Free" },
-    { value: "paid", label: "Paid" },
-  ];
-
-  const modeOptions = [
-    { value: "", label: "All" },
-    { value: "solo", label: "Solo" },
-    { value: "duo", label: "Duo" },
-    { value: "squad", label: "Squad" },
-  ];
-
-  const statusOptions = [
-    { value: "", label: "All" },
-    { value: "open", label: "Open" },
-    { value: "live", label: "Live" },
-    { value: "complete", label: "Complete" },
-  ];
-
+  const router = useRouter();
   const [filters, setFilters] = useState({
     entryFee: "",
     mode: "",
     status: "",
+    gameId: "",
   });
 
   const handleOptionClick = (key, value) => {
@@ -50,6 +33,7 @@ const TournamentPage = () => {
       entryFee: "",
       mode: "",
       status: "",
+      gameId: "",
     });
   };
 
@@ -58,90 +42,104 @@ const TournamentPage = () => {
       {/* Tournaments */}
       <div className="mt-20 flex flex-col">
         {/* title */}
-        <div className="flex justify-between items-center pb-[20px] border-b-[1px] border-tertiary">
+        <div className="flex justify-between items-center pb-[10px] border-b-[1px] border-tertiary">
           <h1 className="text-4xl font-semibold">Tournaments</h1>
 
-          <div className="relative">
+          <div className="relative flex flex-row space-x-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-600 px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:shadow-lg"
+                >
                   Filter
-                  <ListFilter className="w-4 h-4 mb-0.5" />
+                  <ListFilter className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="w-56 bg-black rounded-lg">
-                {/* Entry Fee */}
-                <div className="relative mb-4 p-2">
-                  <label className="block text-sm font-semibold mb-2">
-                    Entry Fee
-                  </label>
-                  {feesOptions.map((option) => (
-                    <div
-                      key={option.value}
-                      className={`px-2 py-1 text-white hover:bg-gray-800 cursor-pointer ${
-                        filters.entryFee === option.value ? "bg-gray-800" : ""
-                      }`}
-                      onClick={() =>
-                        handleOptionClick("entryFee", option.value)
-                      }
+              <DropdownMenuContent className="w-72 bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-4">
+                {[
+                  {
+                    label: "Game",
+                    name: "gameId",
+                    options: [
+                      { value: "", label: "All Games" },
+                      { value: "676d205ad9a2b1079a937312", label: "Valorant" },
+                      { value: "676d205ad9a2b1079a937316", label: "CS:GO" },
+                      { value: "676d205ad9a2b1079a937320", label: "BGMI" },
+                      { value: "676d205ad9a2b1079a937317", label: "Fortnite" },
+                    ],
+                  },
+                  {
+                    label: "Entry Fee",
+                    name: "entryFee",
+                    options: [
+                      { value: "", label: "All" },
+                      { value: "free", label: "Free" },
+                      { value: "paid", label: "Paid" },
+                    ],
+                  },
+                  {
+                    label: "Mode",
+                    name: "mode",
+                    options: [
+                      { value: "", label: "All" },
+                      { value: "solo", label: "Solo" },
+                      { value: "duo", label: "Duo" },
+                      { value: "squad", label: "Squad" },
+                    ],
+                  },
+                  {
+                    label: "Status",
+                    name: "status",
+                    options: [
+                      { value: "", label: "All" },
+                      { value: "open", label: "Open" },
+                      { value: "live", label: "Live" },
+                      { value: "completed", label: "Completed" },
+                    ],
+                  },
+                ].map((filter) => (
+                  <div key={filter.name} className="mb-4">
+                    <label className="text-sm font-medium text-gray-300 mb-2 block">
+                      {filter.label}
+                    </label>
+                    <select
+                      name={filter.name}
+                      value={filters[filter.name]}
+                      onChange={handleFilterChange}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     >
-                      {option.label}
-                    </div>
-                  ))}
-                </div>
+                      {filter.options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
 
-                {/* Mode */}
-                <div className="relative mb-4 p-2">
-                  <label className="block text-sm font-semibold mb-2">
-                    Mode
-                  </label>
-                  {modeOptions.map((option) => (
-                    <div
-                      key={option.value}
-                      className={`px-2 py-1 text-white hover:bg-gray-800 cursor-pointer ${
-                        filters.mode === option.value ? "bg-gray-800" : ""
-                      }`}
-                      onClick={() => handleOptionClick("mode", option.value)}
-                    >
-                      {option.label}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Status */}
-                <div className="relative mb-4 p-2">
-                  <label className="block text-sm font-semibold mb-2">
-                    Status
-                  </label>
-                  {statusOptions.map((option) => (
-                    <div
-                      key={option.value}
-                      className={`px-2 py-1 text-white hover:bg-gray-800 cursor-pointer ${
-                        filters.status === option.value ? "bg-gray-800" : ""
-                      }`}
-                      onClick={() => handleOptionClick("status", option.value)}
-                    >
-                      {option.label}
-                    </div>
-                  ))}
-                </div>
-
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="my-4 border-gray-700" />
 
                 <Button
                   variant="ghost"
                   onClick={clearFilters}
-                  className="w-full transition-colors"
+                  className="w-full bg-gray-700 hover:bg-gray-600 text-gray-200 py-2 rounded-md transition-all"
                 >
                   Clear Filters
                 </Button>
               </DropdownMenuContent>
             </DropdownMenu>
+            <Button
+              onClick={() => {
+                router.push("/create/tournament");
+              }}
+            >
+              Create
+            </Button>
           </div>
         </div>
 
-        {/* tournament cards */}
         <TournamentSection filters={filters} />
       </div>
     </div>

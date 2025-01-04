@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
-
+import { PacmanLoader } from "react-spinners";
 export default function TournamentSection({ filters }) {
   const [tournaments, setTournaments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,41 +28,14 @@ export default function TournamentSection({ filters }) {
 
     fetchTournaments();
   }, []);
-  if (isLoading)
+
+  if (isLoading) {
     return (
-      <div className="flex gap-10 mt-16">
-        <SkeletonTheme
-          baseColor="#202020"
-          highlightColor="#444"
-          height={400}
-          width={288}
-        >
-          <p>
-            <Skeleton />
-          </p>
-        </SkeletonTheme>
-        <SkeletonTheme
-          baseColor="#202020"
-          highlightColor="#444"
-          height={400}
-          width={288}
-        >
-          <p>
-            <Skeleton />
-          </p>
-        </SkeletonTheme>
-        <SkeletonTheme
-          baseColor="#202020"
-          highlightColor="#444"
-          height={400}
-          width={288}
-        >
-          <p>
-            <Skeleton />
-          </p>
-        </SkeletonTheme>
+      <div className="flex w-full h-screen justify-center items-center">
+        <PacmanLoader color="white" />
       </div>
     );
+  }
   if (error) return <div>Error: {error}</div>;
 
   // Apply filters
@@ -78,28 +49,22 @@ export default function TournamentSection({ filters }) {
         : "";
 
     if (filters?.entryFee && filters.entryFee !== entryFee) return false;
-
     if (filters?.mode && filters.mode.toUpperCase() !== tournament.gameType)
       return false;
     if (filters?.status && filters.status !== status.toLowerCase())
       return false;
+    if (filters?.gameId && filters.gameId !== tournament.gameId?._id)
+      return false;
+
     return true;
   });
-
-  function getStatus(dates) {
-    const now = new Date();
-    const startDate = new Date(dates.started);
-    const endDate = new Date(dates.ended);
-
-    if (now < startDate) return "Open";
-    if (now >= startDate && now <= endDate) return "Live";
-    return "Completed";
-  }
 
   return (
     <div className="mt-16 pb-20 flex">
       {filteredTournaments.length === 0 ? (
-        <div>No tournaments match the current filters.</div>
+        <div className="h-full w-full flex justify-center items-center">
+          No tournaments match the current filters.
+        </div>
       ) : (
         <div className="flex flex-wrap gap-10">
           {filteredTournaments.map((tournament) => (
@@ -107,7 +72,8 @@ export default function TournamentSection({ filters }) {
               key={tournament._id}
               href={`/tournaments/${tournament._id}`}
               className=""
-              prefetch={true} // prefetch the tournament page
+              prefetch={true}
+              aria-label="tournament-redirect-btn"
             >
               <TournamentCard {...tournament} />
             </Link>
@@ -116,6 +82,16 @@ export default function TournamentSection({ filters }) {
       )}
     </div>
   );
+}
+
+function getStatus(dates) {
+  const now = new Date();
+  const startDate = new Date(dates.started);
+  const endDate = new Date(dates.ended);
+
+  if (now < startDate) return "Open";
+  if (now >= startDate && now <= endDate) return "Live";
+  return "Completed";
 }
 
 function TournamentCard({
@@ -128,17 +104,7 @@ function TournamentCard({
   gameId,
   organizerId,
 }) {
-  const getStatus = () => {
-    const now = new Date();
-    const startDate = new Date(tournamentDates.started);
-    const endDate = new Date(tournamentDates.ended);
-
-    if (now < startDate) return "Open";
-    if (now >= startDate && now <= endDate) return "Live";
-    return "Completed";
-  };
-
-  const status = getStatus();
+  const status = getStatus(tournamentDates);
   const entryFee =
     prize && prize.length > 0
       ? prize[0].amount === 0

@@ -6,15 +6,16 @@ import "brackets-viewer/dist/brackets-viewer.min.css";
 import "./styles/bracket.css";
 
 async function render(id) {
-  //refer to Template.md file to spin up this path.
+  // Fetching data from the API
   const data = await fetch(`/api/brackets/${id}`).then((res) => res.json());
 
+  // Check if window is defined before accessing it
   if (typeof window !== "undefined") {
     window.bracketsViewer.setParticipantImages(
       data.participant.map((participant) => ({
         participantId: participant.id,
         imageUrl: "https://github.githubassets.com/pinned-octocat.svg",
-      }))
+      })),
     );
 
     window.bracketsViewer.render(
@@ -31,15 +32,19 @@ async function render(id) {
         showSlotsOrigin: true,
         showLowerBracketSlotsOrigin: true,
         highlightParticipantOnHover: true,
-      }
+      },
     );
   }
 }
 
-function Bracket({id}) {
+function Bracket({ id }) {
   useEffect(() => {
+    // Ensure render is called only once when id changes
     render(id);
-  }, []);
+
+  }, [id]);
+  
+// Add id as a dependency
 
   return (
     <>

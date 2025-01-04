@@ -1,51 +1,76 @@
-"use client"
+"use client";
 
-import { useParams } from "next/navigation"
-import Bracket from "../../../components/Brackets"
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import Bracket from "../../../components/Brackets";
+
+import NewBracket from "../../../components/NewBracket";
+
+import { PacmanLoader } from "react-spinners";
 
 const BracketTemplate = () => {
-    const numOfTeams = 13;
-    const typeOfElimination = "Single";
-    const nameOfTournament = "XYZ";
-    const gridRows = numOfTeams % 2 === 0 ? numOfTeams : numOfTeams + 1;
-    const params = useParams()
-    const { id } = params
+  const [bracket, setBracket] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { id } = useParams();
 
+  useEffect(() => {
+    const fetchBracket = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/brackets/" + id);
+        if (!response.ok) {
+          throw new Error("Failed to fetch brackets");
+        }
+        const data = await response.json();
+        setBracket(data);
+      } catch (error) {
+        console.error("Error fetching brackets:", error);
+        setError("Failed to load brackets. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBracket();
+  }, [id]);
+
+  if (loading) {
     return (
-        <section className="px-5 xl:px-[10%] mt-[7.6875rem]">
-            <header aria-labelledby="tournament_heading">
-                <h2 className="font-black text-3xl" id="tournament_heading">
-                    {nameOfTournament} Tournament
-                </h2>
-                <p className="text-xl">
-                    {numOfTeams} Teams{" "}
-                    <span className="text-lg">({typeOfElimination} Elimination)</span>
-                </p>
-            </header>
-            {/* <div className="mt-20 bg-white/5 p-5 rounded-xl">
-        <div
-          className="grid gap-y-4 gap-x-[4.5rem]"
-          style={{
-            gridTemplateRows: `repeat(${gridRows}, 3.75rem)`,
-            gridAutoColumns: "auto",
-          }}
-        >
-          {numOfTeams % 2 !=== 0 && <article style={{
-            gridRowStart: (numOfTeams / 2) + 1,
-            gridRowEnd: (numOfTeams / 2) + 2,
-            gridColumnStart 
-          }}></article>}
-          {Array.from({ length: Math.floor(numOfTeams / 2) }).map((_, i) => (
-            <article className="row-span-2 rounded-2xl overflow-clip" key={i}>
-              <div></div>
-              <div></div>
-            </article>
-          ))}
-        </div>
-      </div> */}
-            <Bracket id={id} />
-        </section>
+      <div className="flex w-full h-screen justify-center items-center">
+        <PacmanLoader color="white" />
+      </div>
     );
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  // Destructure the bracket data once it's loaded
+  const { tournamentName, format, participant, round } = bracket;
+  console.log(bracket);
+
+  return (
+    <section className="px-5 xl:px-[10%] mt-[7.6875rem] ">
+      <header aria-labelledby="tournament_heading flex flex-col gap-5">
+        <h2 className="font-black text-3xl" id="tournament_heading">
+          {tournamentName}
+        </h2>
+        <p className="text-xl">{participant.length} Teams </p>
+        <span className="text-xl text-gray-400">
+          {format === "single_elimination"
+            ? "Single Elimination"
+            : format === "double_elimination"
+              ? "Double Elimination"
+              : "Invalid Format"}
+        </span>
+      </header>
+      {/* The commented-out bracket grid is not needed for now */}
+      {/* <Bracket id={id} /> */}
+      <NewBracket participant={participant} />
+    </section>
+  );
 };
 
 export default BracketTemplate;

@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { platforms, timezones } from "./tournament/data";
 import { Button } from "../../../@/components/ui/button";
+import { toast } from "sonner";
+import { FaArrowLeftLong } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
   const [selectedPlatform, setSelectedPlatform] = useState("");
   const [participantType, setParticipantType] = useState("");
   const [selectedTimezone, setSelectedTimezone] = useState("");
@@ -67,6 +71,7 @@ export default function Page() {
       !size
     ) {
       setErrorMessage("Please fill out all fields.");
+      toast.error("Please fill out all fields.");
       setIsSubmitting(false);
       return;
     }
@@ -82,12 +87,14 @@ export default function Page() {
     try {
       const response = await axios.post("/api/tournaments", formData);
       setSuccessMessage(response.data.message);
+      toast.success(response.data.message);
       setTournamentName("");
       setSelectedPlatform("");
       setParticipantType("");
       setSelectedTimezone("");
       setSize("");
     } catch (error) {
+      toast.error(error.response.data.message);
       if (error.response) {
         setErrorMessage(error.response.data.message);
       } else {
@@ -108,33 +115,52 @@ export default function Page() {
     setErrorMessage("");
   };
 
+  const validateImageFile = (file) => {
+    return file && file.type.startsWith("image/") && file.size > 0;
+  };
+
   const handleIconUpload = (event) => {
     const file = event.target.files[0];
-    if (file && file.type.substr(0, 5) === "image") {
-      setTournamentIcon(URL.createObjectURL(file));
+    if (validateImageFile(file)) {
+      const objectURL = URL.createObjectURL(file);
+      setTournamentIcon(objectURL);
     } else {
-      alert("Please select an image file");
+      alert("Please select a valid image file");
     }
   };
 
   const handleBannerUpload = (event) => {
     const file = event.target.files[0];
-    if (file && file.type.substr(0, 5) === "image") {
-      setTournamentBanner(URL.createObjectURL(file));
+    if (validateImageFile(file)) {
+      const objectURL = URL.createObjectURL(file);
+      setTournamentBanner(objectURL);
     } else {
-      alert("Please select an image file");
+      alert("Please select a valid image file");
     }
   };
 
   return (
     <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-semibold mb-8">Create New Tournament</h2>
+        <div className="text-center flex items-center justify-center border-b pb-4">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              router.push("/tournaments");
+            }}
+            className="mr-auto"
+          >
+            <FaArrowLeftLong className="size-5" />
+          </Button>
+          <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight absolute left-1/2 transform -translate-x-1/2">
+            Create Tournament
+          </h2>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="md:col-span-1">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 mt-8">
+          <div className="md:col-span-2">
             <label htmlFor="icon-upload" className="block">
-              <div className="h-40 bg-foreground/5 flex flex-col items-center justify-center cursor-pointer rounded-lg relative overflow-hidden">
+              <div className="h-40 bg-foreground/5 flex flex-col items-center justify-center cursor-pointer rounded-lg relative overflow-hidden border">
                 {tournamentIcon ? (
                   <img
                     src={tournamentIcon}
@@ -159,9 +185,9 @@ export default function Page() {
               onChange={handleIconUpload}
             />
           </div>
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <label htmlFor="banner-upload" className="block">
-              <div className="h-40 bg-foreground/5 flex flex-col items-center justify-center cursor-pointer rounded-lg relative overflow-hidden">
+              <div className="h-40 bg-foreground/5 flex flex-col items-center justify-center cursor-pointer rounded-lg relative overflow-hidden border">
                 {tournamentBanner ? (
                   <img
                     src={tournamentBanner}
@@ -334,7 +360,9 @@ export default function Page() {
             Prize Configuration{" "}
             <span className="text-foreground/50 text-sm">ⓘ</span>
           </h3>
-          <Button className="px-4 py-2 rounded">Add Prize</Button>
+          <Button arial-label="add-prize-btn" className="px-4 py-2 rounded">
+            Add Prize
+          </Button>
         </div>
 
         {/* Rules */}
@@ -347,13 +375,20 @@ export default function Page() {
             className="w-fit bg-foreground/5 p-2 rounded mb-2 text-sm"
             placeholder="Enter Rule"
           />
-          <Button className="px-4 py-2 rounded w-fit">Add Rule</Button>
+          <Button
+            arial-label="add-rule-btn"
+            className="px-4 py-2 rounded w-fit"
+          >
+            Add Rule
+          </Button>
         </div>
 
         {/* Sponsors */}
         <div className="mt-8">
           <h3 className="text-xl font-semibold mb-4">Sponsors</h3>
-          <Button className=" px-4 py-2 rounded">Add Sponsor</Button>
+          <Button arial-label="add-sponsor-btn" className=" px-4 py-2 rounded">
+            Add Sponsor
+          </Button>
         </div>
 
         {/* Game Configuration */}
@@ -385,7 +420,9 @@ export default function Page() {
               />
             </div>
           </div>
-          <Button className="mt-4 px-4 py-2">Add Game Config</Button>
+          <Button arial-label="add-game-config-btn" className="mt-4 px-4 py-2">
+            Add Game Config
+          </Button>
         </div>
 
         {/* Tournament Configuration */}
@@ -462,7 +499,10 @@ export default function Page() {
               />
             </div>
           </div>
-          <Button className="mt-4 px-4 py-2 rounded">
+          <Button
+            arial-label="add-tournament-config-btn"
+            className="mt-4 px-4 py-2 rounded"
+          >
             Add Tournament Config
           </Button>
         </div>
@@ -473,6 +513,7 @@ export default function Page() {
             type="submit"
             className={`mt-10 px-6 py-2 rounded-md font-semibold text-white ${isSubmitting ? "bg-blue-500" : "bg-blue-600 hover:bg-blue-700"} transition-colors duration-300`}
             disabled={isSubmitting}
+            arial-label="team-create-btn"
           >
             {isSubmitting ? "Creating..." : "Create Tournament"}
           </button>

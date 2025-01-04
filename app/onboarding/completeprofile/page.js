@@ -62,11 +62,12 @@ export default function CompleteProfilePage() {
                 <button
                   key={idx}
                   type="button"
+                  arial-label="complete-profile-btn"
                   className={`px-2 py-2 text-sm md:px-4 md:text-base rounded-xl transition-all
                     ${
                       selectedExpLevel === button
                         ? "bg-blue-500 text-white"
-                        : "bg-gray-200 dark:bg-gray-800"
+                        : "bg-gray-200"
                     }  
                   `}
                   onClick={() => handleExpLevelButtonClick(button)}
@@ -105,11 +106,9 @@ export default function CompleteProfilePage() {
                 className="block w-full px-2 py-2.5 rounded-md border text-sm bg-transparent"
                 placeholder="select gender"
               >
-                <option value="" className="dark:bg-background">
-                  Select Gender
-                </option>
+                <option value="">Select Gender</option>
                 {genderOptions.map((item, idx) => (
-                  <option key={idx} value={item} className="dark:bg-background">
+                  <option key={idx} value={item}>
                     {item}
                   </option>
                 ))}
@@ -149,7 +148,11 @@ export default function CompleteProfilePage() {
           </div>
 
           <div className="flex justify-end items-end">
-            <Button type="submit" className="px-4 py-2">
+            <Button
+              type="submit"
+              className="px-4 py-2"
+              arial-label="create-profile-submit-btn"
+            >
               Submit
             </Button>
           </div>

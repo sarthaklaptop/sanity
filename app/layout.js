@@ -1,11 +1,12 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import { ThemeProvider } from "../components/theme-provider";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AuthProvider from "../context/AuthProvider";
 import NextTopLoader from "nextjs-toploader";
 import dotenv from "dotenv";
+import { Analytics } from "@vercel/analytics/next";
+import { Toaster } from "sonner";
 
 dotenv.config();
 
@@ -57,19 +58,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <AuthProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body className={helvetica.className}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <NextTopLoader />
-            <Navbar />
-            <main className="mx-auto mt-10">{children}</main>
-            <Footer />
-          </ThemeProvider>
+          <NextTopLoader />
+          <Navbar />
+          <main className="mx-auto mt-10">{children}</main>
+          <Footer />
+          <Toaster richColors />
+          <Analytics />
         </body>
       </html>
     </AuthProvider>
